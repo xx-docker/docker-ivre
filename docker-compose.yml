@@ -20,8 +20,10 @@ services:
      image: 'ivre/web'
      ports:
        - "1280:80"
-     links:
-       - ivredb:ivredb
+     depends_on:
+       - ivredb
+     volumes:
+       - /etc/localtime:/etc/localtime:ro
      networks:
        customize_net:
          ipv4_address: 192.168.192.223
@@ -30,10 +32,12 @@ services:
      container_name: ivreclient
      restart: always
      image: 'ivre/client'
-     links:
-       - ivredb:ivredb
+     working_dir: /root
+     depends_on:
+       - ivredb
      volumes:
-        - ./ivre-share:/ivre-share
+       - /etc/localtime:/etc/localtime:ro
+       - ./ivre-share:/ivre-share
      networks:
        customize_net:
          ipv4_address: 192.168.192.111
