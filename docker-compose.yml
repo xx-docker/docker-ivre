@@ -1,0 +1,47 @@
+version: "2.2"
+
+services:
+   ivredb:
+      container_name: ivredb
+      restart: always
+      image: 'ivre/db'
+      ports:
+        - "27017:27017"
+      volumes:
+        - ./var_lib_mongodb:/var/lib/mongodb
+        - ./var_log_mongodb:/var/log/mongodb
+      networks:
+          customize_net:
+            ipv4_address: 192.168.192.27
+
+   ivreweb:
+     container_name: ivreweb
+     restart: always
+     image: 'ivre/web'
+     ports:
+       - "1280:80"
+     links:
+       - ivredb:ivredb
+     networks:
+       customize_net:
+         ipv4_address: 192.168.192.223
+
+   ivreclient:
+     container_name: ivreclient
+     restart: always
+     image: 'ivre/client'
+     links:
+       - ivredb:ivredb
+     volumes:
+        - ./ivre-share:/ivre-share
+     networks:
+       customize_net:
+         ipv4_address: 192.168.192.111
+
+networks:
+  customize_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.192.0/24
